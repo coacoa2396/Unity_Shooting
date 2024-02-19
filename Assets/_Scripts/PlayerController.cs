@@ -17,16 +17,19 @@ public class PlayerController : MonoBehaviour
     [SerializeField] CinemachineVirtualCamera TPS;
     [SerializeField] Animator animator;
     [SerializeField] TwoBoneIKConstraint LeftHandIK;
+    [SerializeField] MultiAimConstraint FPSoffset;
 
 
 
-    [Header("Specs")]
+    [Header("Specs")]    
     [SerializeField] float moveSpeed;
     [SerializeField] float walkSpeed;
     [SerializeField] float jumpSpeed;
 
     CinemachineVirtualCamera curCamera;
     Vector3 moveDir;
+    Vector3 TPSOffset;
+    Vector3 FPSOffset;
     float ySpeed;
     bool isWalk;
 
@@ -34,6 +37,8 @@ public class PlayerController : MonoBehaviour
     private void Awake()
     {
         curCamera = FPS;
+        TPSOffset = new Vector3(-45, 0, 0);
+        FPSOffset = new Vector3(0,0,0);
     }
 
     private void Update()
@@ -100,6 +105,7 @@ public class PlayerController : MonoBehaviour
             curCamera = TPS;
             //MainCamera.cullingMask |= 1 << LayerMask.NameToLayer("Player");
             MainCamera.cullingMask = 9;
+            FPSoffset.data.offset = TPSOffset;
         }
         else
         {
@@ -107,6 +113,7 @@ public class PlayerController : MonoBehaviour
             curCamera = FPS;
             //MainCamera.cullingMask = MainCamera.cullingMask & ~(1 << LayerMask.NameToLayer("Player"));
             MainCamera.cullingMask = 1;
+            FPSoffset.data.offset = FPSOffset;
         }
     }
 
