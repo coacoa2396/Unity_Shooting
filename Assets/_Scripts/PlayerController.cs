@@ -4,6 +4,8 @@ using Unity.VisualScripting.Dependencies.NCalc;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using Cinemachine;
+using System.Xml.Serialization;
+using UnityEngine.Animations.Rigging;
 
 
 public class PlayerController : MonoBehaviour
@@ -13,16 +15,21 @@ public class PlayerController : MonoBehaviour
     [SerializeField] Camera MainCamera;
     [SerializeField] CinemachineVirtualCamera FPS;
     [SerializeField] CinemachineVirtualCamera TPS;
-    
+    [SerializeField] Animator animator;
+    [SerializeField] TwoBoneIKConstraint LeftHandIK;
+
 
 
     [Header("Specs")]
     [SerializeField] float moveSpeed;
+    [SerializeField] float walkSpeed;
     [SerializeField] float jumpSpeed;
 
     CinemachineVirtualCamera curCamera;
     Vector3 moveDir;
     float ySpeed;
+    bool isWalk;
+
 
     private void Awake()
     {
@@ -37,9 +44,25 @@ public class PlayerController : MonoBehaviour
 
     void Move()
     {
-        //controller.Move(moveDir * moveSpeed * Time.deltaTime);        // 월드 기준으로 움직인다
-        controller.Move(transform.right * moveDir.x * moveSpeed * Time.deltaTime);
-        controller.Move(transform.forward * moveDir.z * moveSpeed * Time.deltaTime);
+
+        if (isWalk)
+        {
+            controller.Move(transform.right * moveDir.x * walkSpeed * Time.deltaTime);
+            controller.Move(transform.forward * moveDir.z * walkSpeed * Time.deltaTime);
+            animator.SetFloat("XSpeed", moveDir.x * walkSpeed, 0.1f, Time.deltaTime);
+            animator.SetFloat("YSpeed", moveDir.z * walkSpeed, 0.1f, Time.deltaTime);
+            animator.SetFloat("MoveSpeed", moveDir.magnitude * walkSpeed, 0.1f, Time.deltaTime);
+        }
+        else
+        {
+            //controller.Move(moveDir * moveSpeed * Time.deltaTime);        // 월드 기준으로 움직인다
+            controller.Move(transform.right * moveDir.x * moveSpeed * Time.deltaTime);
+            controller.Move(transform.forward * moveDir.z * moveSpeed * Time.deltaTime);
+            animator.SetFloat("XSpeed", moveDir.x * moveSpeed, 0.1f, Time.deltaTime);
+            animator.SetFloat("YSpeed", moveDir.z * moveSpeed, 0.1f, Time.deltaTime);
+            animator.SetFloat("MoveSpeed", moveDir.magnitude * moveSpeed, 0.1f, Time.deltaTime);
+        }
+
 
     }
 
@@ -76,14 +99,55 @@ public class PlayerController : MonoBehaviour
             TPS.Priority = 20;
             curCamera = TPS;
             //MainCamera.cullingMask |= 1 << LayerMask.NameToLayer("Player");
-            MainCamera.cullingMask = 36;
+            MainCamera.cullingMask = 9;
         }
         else
         {
             TPS.Priority = 0;
             curCamera = FPS;
             //MainCamera.cullingMask = MainCamera.cullingMask & ~(1 << LayerMask.NameToLayer("Player"));
-            MainCamera.cullingMask = 9;
+            MainCamera.cullingMask = 1;
         }
+    }
+
+    void OnWalk(InputValue value)
+    {
+        if (value.isPressed)
+        {
+            isWalk = true;
+        }
+        else
+        {
+            isWalk = false;
+        }
+    }
+
+    public void Fire()
+    {
+        animator.SetTrigger("Fire");
+
+    }
+
+    public void Reload()
+    {
+        animator.SetTrigger("Reload");
+        StartCoroutine(IKChange());
+    }
+
+    IEnumerator IKChange()
+    {
+        LeftHandIK.weight = 0;
+        yield return new WaitForSeconds(2f);
+        LeftHandIK.weight = 1;
+    }
+
+    void OnFire(InputValue value)
+    {
+        Fire();
+    }
+
+    void OnReload(InputValue value)
+    {
+        Reload();
     }
 }

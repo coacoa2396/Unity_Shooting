@@ -7,14 +7,16 @@ using UnityEngine.InputSystem;
 public class FPSCameraController : MonoBehaviour
 {
     [SerializeField] Transform CameraRoot;
+    
     [SerializeField] float sensitivity;
     
 
     Vector2 inputDir;
     float yRotation;
 
+    
 
-    private void Update()
+    private void LateUpdate()
     {
         yRotation -= inputDir.y * sensitivity * Time.deltaTime;
         yRotation = Mathf.Clamp(yRotation, -80f, 80f);
@@ -25,6 +27,8 @@ public class FPSCameraController : MonoBehaviour
         //CameraRoot.Rotate(Vector3.right, sensitivity * -inputDir.y * Time.deltaTime);
         
     }
+
+    
 
     private void OnEnable()
     {
