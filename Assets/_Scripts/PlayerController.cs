@@ -18,6 +18,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] Animator animator;
     [SerializeField] TwoBoneIKConstraint LeftHandIK;
     [SerializeField] MultiAimConstraint FPSoffset;
+    [SerializeField] WeaponHolder WeaponHolder;
 
 
 
@@ -40,6 +41,8 @@ public class PlayerController : MonoBehaviour
         TPSOffset = new Vector3(-45, 0, 0);
         FPSOffset = new Vector3(0,0,0);
     }
+
+    
 
     private void Update()
     {
@@ -131,6 +134,7 @@ public class PlayerController : MonoBehaviour
 
     public void Fire()
     {
+        WeaponHolder.Fire();
         animator.SetTrigger("Fire");
 
     }
