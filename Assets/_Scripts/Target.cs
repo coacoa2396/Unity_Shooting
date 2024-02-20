@@ -5,10 +5,14 @@ using UnityEngine;
 public class Target : MonoBehaviour, IDamagable
 {
     [SerializeField] int hp;
+    [SerializeField] ParticleSystem particle;
+    
 
     void Die()
     {
         Destroy(gameObject);        // gameObject : 컴포넌트를 달고있는 자기자신
+        particle.Play();
+        Destroy(particle.gameObject, 2f);
     }
 
     public void TakeDamage(int damage)
